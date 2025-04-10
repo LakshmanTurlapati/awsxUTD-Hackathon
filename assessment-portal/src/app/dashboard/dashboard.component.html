@@ -1,0 +1,140 @@
+<div class="dashboard-container">
+  <div class="widget left-widget">
+    <h3>Referers</h3>
+    <div class="profiles-list">
+      <div class="user-profile" (click)="showUserProfile('prasad')">
+        <div class="avatar">
+          <img src="../../assets/prasad.jpg" alt="Prasad D">
+        </div>
+        <div class="user-details">
+          <div class="name">Prasad D.</div>
+          <div class="designation">Devops Engineer</div>
+        </div>
+      </div>
+      <div class="user-profile" (click)="showUserProfile('nijara')">
+        <div class="avatar">
+          <img src="../../assets/nijara.png" alt="Nijara Roy">
+        </div>
+        <div class="user-details">
+          <div class="name">Nijara Roy</div>
+          <div class="designation">Cloud Developer</div>
+        </div>
+      </div>
+      <div class="user-profile" (click)="showUserProfile('akanksha')">
+        <div class="avatar">
+          <img src="../../assets/a.jpeg" alt="Akanksha K">
+        </div>
+        <div class="user-details">
+          <div class="name">Akanksha K.</div>
+          <div class="designation">Java Developer</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="widget center-widget">
+    <!-- Profile details view (shown when a profile is clicked) -->
+    <div *ngIf="showProfileDetails" class="profile-details-main">
+      <div class="back-button" (click)="hideUserProfile()">
+        <i class="fa fa-arrow-left"></i> Back to Candidates
+      </div>
+      <div class="profile-card-main">
+        <div class="avatar large">
+          <img [src]="'../../assets/' + currentProfile.image" [alt]="currentProfile.name">
+        </div>
+        <h2>{{ currentProfile.name }}</h2>
+        <p class="designation">{{ currentProfile.role }}</p>
+        <div class="profile-info-main">
+          <div class="info-section">
+            <h3>Skills</h3>
+            <p>{{ currentProfile.skills }}</p>
+          </div>
+          <div class="info-section">
+            <h3>Experience</h3>
+            <p>{{ currentProfile.experience }}</p>
+          </div>
+          <div class="info-section">
+            <h3>About</h3>
+            <p>{{ currentProfile.about }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Original table view (hidden when profile details are shown) -->
+    <div *ngIf="!showProfileDetails">
+      <div *ngIf="loading" class="loading-indicator">
+        <p>Loading candidate data...</p>
+      </div>
+      <div *ngIf="error" class="error-message">
+        <p>{{ error }}</p>
+      </div>
+      <div *ngIf="!loading && !error" class="candidates-table-container">
+        <table class="candidates-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Education</th>
+              <th>Experience</th>
+              <th>Fluency</th>
+              <th>Interpersonal</th>
+              <th>Interests</th>
+              <th>Career Goals</th>
+              <th>Python</th>
+              <th>Java</th>
+              <th>AWS</th>
+              <th>C++</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="candidates.length === 0">
+              <td colspan="13" class="no-data">No candidates found</td>
+            </tr>
+            <tr *ngFor="let candidate of candidates" 
+                [class.selected]="selectedCandidate?.id === candidate.id"
+                (click)="selectCandidate(candidate)">
+              <td>{{ candidate.name }}</td>
+              <td>{{ candidate.education }}</td>
+              <td>{{ candidate.experience }} {{ candidate.experience === 8 ? '+' : '' }} yrs</td>
+              <td>{{ candidate.fluencyScore || 0 }}/100</td>
+              <td>{{ candidate.interpersonalScore || 0 }}/10</td>
+              <td>{{ candidate.interestsScore || 0 }}/10</td>
+              <td>{{ candidate.careerGoalsScore || 0 }}/10</td>
+              <td>{{ candidate.pythonScore || 0 }}/1</td>
+              <td>{{ candidate.javaScore || 0 }}/1</td>
+              <td>{{ candidate.awsScore || 0 }}/1</td>
+              <td>{{ candidate.cppScore || 0 }}/1</td>
+              <td class="total-score">{{ getTotalScore(candidate) }}/34</td>
+              <td>
+                <button (click)="deleteCandidate(candidate.id); $event.stopPropagation()" class="delete-btn">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  <div class="right-widget">
+    <div class="widget">
+      <ng-container *ngIf="selectedCandidate && !showProfileDetails; else noCandidate">
+        <div class="radar-map-placeholder">
+          <canvas id="radarChart"></canvas>
+        </div>
+      </ng-container>
+      <ng-template #noCandidate>
+        <div class="selection-prompt" style="padding-left: 10px; padding-right: 10px;">
+          <i class="fa fa-info-circle"></i>
+          <span>Please select a candidate.</span>
+        </div>
+      </ng-template>
+    </div>
+    <div class="widget">
+      <!-- Unused widget. Will be developed soon -->
+    </div>
+  </div>
+</div>

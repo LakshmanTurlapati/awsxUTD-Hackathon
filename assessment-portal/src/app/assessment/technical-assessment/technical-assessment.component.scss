@@ -1,0 +1,44 @@
+.technical-assessment-container {
+  margin-top: 20px;
+}
+
+.section-title {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+}
+
+.assessment-description {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.question-container {
+  margin-bottom: 20px;
+  position: relative;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.question-prefix {
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+.question-divider {
+  margin: 30px 0;
+  border: 0;
+  border-top: 1px solid #eee;
+}
+
+.error-message {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #ffeeee;
+  border: 1px solid #ffcccc;
+  border-radius: 4px;
+  color: #cc0000;
+  font-size: 14px;
+} 

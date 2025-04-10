@@ -1,0 +1,11 @@
+# Use specific versions if needed, but these are generally compatible
+openai-whisper
+librosa
+numpy
+# torch is a dependency of whisper, specify if you need CPU/GPU version explicitly
+# For CPU only:
+# torch --index-url https://download.pytorch.org/whl/cpu
+# For CUDA (adjust cuXXX version based on your CUDA install):
+# torch --index-url https://download.pytorch.org/whl/cu118
+# If unsure, pip will often pick a suitable version, but explicit is safer.
+torch

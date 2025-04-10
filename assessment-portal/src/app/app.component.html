@@ -1,0 +1,18 @@
+<div class="main-container" [class.dashboard-active]="isDashboardActive">
+  <nav class="nav-bar">
+    <div class="nav-content">
+      <a (click)="navigateTo('dashboard')" [class.active]="activeTab === 'dashboard'">Dashboard</a>
+      <a (click)="navigateTo('assessment')" [class.active]="activeTab === 'assessment'">Assessment</a>
+    </div>
+  </nav>
+  
+  <div class="content-container">
+    <router-outlet></router-outlet>
+  </div>
+  <div class="footer-image">
+    <img [src]="isDashboardActive ? 'assets/interestingtimes.png' : 'assets/awsxutd.png'" alt="Logo" style="width: 100%; max-width: 200px; display: block; margin: 0 auto;">
+  </div>
+  <footer class="text-center" style="padding: 1rem; margin-top: auto;">
+    &copy; awsxUTD - All rights reserved
+  </footer>
+</div>

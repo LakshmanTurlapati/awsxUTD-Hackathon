@@ -1,0 +1,131 @@
+.question {
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option {
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  padding: 10px ;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #ffe8cc;
+  }
+  
+  input[type="radio"] {
+    margin-top: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .option-text {
+    margin-bottom: 0;
+    cursor: pointer;
+    color: #333;
+    width: 100%;
+  }
+  
+  input[type="radio"]:checked {
+    border-color: #FF9900;
+  }
+  
+  input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #FF9900;
+  }
+}
+
+// Option text style on selected state, if desired
+.option input[type="radio"]:checked + .option-text {
+  font-weight: 500;
+  color: #000;
+}
+
+// Add styling for the persistently selected option
+.option.selected {
+  background-color: #ffe8cc;
+}
+
+.option.selected .option-text {
+  font-weight: bold;
+  color: #000;
+}
+
+// Loading skeleton styles
+.loading-skeleton {
+  width: 100%;
+}
+
+.question-skeleton, .option-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.question-skeleton {
+  height: 24px;
+  width: 90%;
+  margin-bottom: 15px;
+}
+
+.options-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option-skeleton {
+  height: 50px;
+  width: 100%;
+  border-radius: 8px;
+  
+  &:nth-child(2) {
+    width: 100%;
+  }
+  
+  &:nth-child(3) {
+    width: 100%;
+  }
+  
+  &:nth-child(4) {
+    width: 100%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+} 

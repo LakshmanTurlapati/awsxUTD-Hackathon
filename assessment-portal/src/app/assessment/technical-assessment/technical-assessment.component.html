@@ -1,0 +1,17 @@
+<div class="technical-assessment-container" *ngIf="showAssessment">
+  <h2 class="section-title">Technical Assessment</h2>
+  <p class="assessment-description">Please answer the following questions based on your technical expertise.</p>
+  
+  <div *ngFor="let topic of topics; let i = index" class="question-container">
+    <app-question
+      [question]="questions[topic]"
+      [loading]="loadingQuestions[topic]"
+      (optionSelected)="onOptionSelected(topic, $event)">
+      <span question-prefix class="question-prefix">Q{{ i+1 }}. </span>
+    </app-question>
+    <div *ngIf="errorMessages[topic]" class="error-message">
+      {{ errorMessages[topic] }}
+    </div>
+    <hr *ngIf="i < topics.length - 1" class="question-divider">
+  </div>
+</div> 

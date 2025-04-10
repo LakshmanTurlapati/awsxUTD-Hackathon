@@ -1,0 +1,178 @@
+<div class="assessment-container">
+  <form class="assessment-form">
+    <!-- Personal Information Section -->
+    <div class="card">
+      <h2 class="section-title">Personal Information</h2>
+      
+      <div class="form-group">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" id="name" class="form-control" placeholder="Enter your full name" [ngClass]="{'is-invalid': formErrors['name']}">
+        <div class="error-message" *ngIf="formErrors['name']">{{ formErrors['name'] }}</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" id="email" class="form-control" placeholder="Enter your email address" [ngClass]="{'is-invalid': formErrors['email']}">
+        <div class="error-message" *ngIf="formErrors['email']">{{ formErrors['email'] }}</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="education" class="form-label">Education</label>
+        <input type="text" id="education" class="form-control" placeholder="Your highest education qualification" [ngClass]="{'is-invalid': formErrors['education']}">
+        <div class="error-message" *ngIf="formErrors['education']">{{ formErrors['education'] }}</div>
+      </div>
+    </div>
+    
+    <!-- Voice Recording Section -->
+    <div class="card">
+      <h2 class="section-title">Voice Introduction</h2>
+      
+      <div class="voice-intro-header">
+        <p class="form-label">Please tell us about yourself in under 2 mins.</p>
+        <button type="button" class="btn btn-primary record-btn">
+          <i class="fa fa-microphone"></i>
+        </button>
+      </div>
+      
+      <div class="voice-recording-container">
+        <!-- Transcription container -->
+        <div class="transcription-container">
+          <p *ngIf="!currentTranscription" class="transcription-placeholder">Your speech will be transcribed here in real-time...</p>
+          <p *ngIf="currentTranscription" class="transcription-text">{{ currentTranscription }}</p>
+          
+          <!-- Loading skeleton for fluency score -->
+          <div *ngIf="isLoadingFluencyScore" class="fluency-score-loading">
+            <!-- <h4 class="skeleton-text">Analyzing fluency...</h4> -->
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line"></div>
+          </div>
+          
+          <!-- Error message for fluency score analysis -->
+          <div *ngIf="fluencyScoreError && !isLoadingFluencyScore" class="fluency-score-error">
+            <h4>Error Analyzing Fluency</h4>
+            <p>We encountered an issue analyzing your speech fluency. Your recording was saved successfully.</p>
+            <p>Please try again or continue with the assessment.</p>
+          </div>
+          
+          <!-- Show fluency score if available -->
+          <div *ngIf="fluencyScore && !isLoadingFluencyScore && !fluencyScoreError" class="fluency-score">
+            <h4>Fluency Score: {{ fluencyScore.overall_score }}/100</h4>
+            <p>Words per minute: {{ fluencyScore.wpm | number:'1.0-0' }}</p>
+            <p>Filler count: {{ fluencyScore.filler_count }}</p>
+            <p>Speech rate: {{ fluencyScore.speech_rate }}</p>
+            <p>Rhythm score: {{ fluencyScore.rhythm_score }}</p>
+          </div>
+        </div>
+        
+        <div class="timer">02:00</div>
+        
+        <div class="recording-status">
+          <canvas class="waveform" height="60"></canvas>
+        </div>
+        <div class="microphone-status">
+          <p class="status-text">Microphone active: Real-time audio visualization</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Short Answer Questions -->
+    <div class="card">
+      <h2 class="section-title">Short Answer Questions</h2>
+      
+      <div class="form-group">
+        <label for="interests" class="form-label">Interests: Which domains excite you? and why?</label>
+        <textarea id="interests" class="form-control" rows="4" placeholder="Share domains that excite you and explain why"></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="career-goals" class="form-label">Intent/Career Goals: What type of work energizes you?</label>
+        <textarea id="career-goals" class="form-control" rows="4" placeholder="Describe the type of work that energizes you"></textarea>
+      </div>
+    </div>
+    
+    <!-- Work Experience Slider -->
+    <div class="card">
+      <h2 class="section-title">Work Experience</h2>
+      
+      <div class="form-group">
+        <label for="experience" class="form-label">Number of years of work experience: <span class="experience-value">0</span></label>
+        <input type="range" id="experience" class="experience-slider" min="0" max="8" step="1" value="0">
+        <div class="slider-labels">
+          <span>0</span>
+          <span>1</span>
+          <span>2</span>
+          <span>3</span>
+          <span>4</span>
+          <span>5</span>
+          <span>6</span>
+          <span>7</span>
+          <span>8+</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Technical Assessment -->
+    <div class="card">
+      <app-technical-assessment 
+        [experienceValue]="experienceValue"
+        [showAssessment]="showTechnicalAssessment">
+      </app-technical-assessment>
+    </div>
+    
+    <!-- Submit Button -->
+    <div class="submit-container">
+      <button type="submit" class="btn btn-primary submit-btn">Submit Assessment</button>
+    </div>
+  </form>
+
+  <!-- Score Popup Modal -->
+  <div *ngIf="showScorePopup" class="score-popup-overlay">
+    <div class="score-popup">
+      <h2>Assessment Results</h2>
+      <div class="score-summary">
+        <div class="score-item">
+          <span class="score-label">Fluency:</span>
+          <span class="score-value">{{ candidateScores?.fluency || 0 }}/100</span>
+        </div>
+        <div class="score-item">
+          <span class="score-label">Interpersonal (Average):</span>
+          <span class="score-value">{{ candidateScores?.interpersonal || 0 }}/10</span>
+        </div>
+        <div class="score-item">
+          <span class="score-label">Interests:</span>
+          <span class="score-value">{{ candidateScores?.interests || 0 }}/10</span>
+        </div>
+        <div class="score-item">
+          <span class="score-label">Career Goals:</span>
+          <span class="score-value">{{ candidateScores?.careerGoals || 0 }}/10</span>
+        </div>
+        <div class="score-item">
+          <span class="score-label">Python:</span>
+          <span class="score-value">{{ candidateScores?.python || 0 }}/1</span>
+        </div>
+        <div class="score-item">
+          <span class="score-label">Java:</span>
+          <span class="score-value">{{ candidateScores?.java || 0 }}/1</span>
+        </div>
+        <div class="score-item">
+          <span class="score-label">AWS:</span>
+          <span class="score-value">{{ candidateScores?.aws || 0 }}/1</span>
+        </div>
+        <div class="score-item">
+          <span class="score-label">C++:</span>
+          <span class="score-value">{{ candidateScores?.cpp || 0 }}/1</span>
+        </div>
+        <div class="score-item total-score">
+          <span class="score-label">Total Score:</span>
+          <span class="score-value">{{ candidateScores?.total || 0 }}/34</span>
+        </div>
+      </div>
+      <div class="popup-actions">
+        <button (click)="submitScores()" class="btn btn-primary">Submit</button>
+        <button (click)="retakeAssessment()" class="btn btn-secondary">Retake Assessment</button>
+      </div>
+    </div>
+  </div>
+</div>

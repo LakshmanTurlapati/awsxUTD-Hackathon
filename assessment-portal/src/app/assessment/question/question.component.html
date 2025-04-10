@@ -1,0 +1,29 @@
+<div class="form-group">
+  <ng-container *ngIf="loading">
+    <!-- Loading skeleton -->
+    <div class="loading-skeleton">
+      <div class="question-skeleton"></div>
+      <div class="options-skeleton">
+        <div class="option-skeleton" *ngFor="let i of [1,2,3,4]"></div>
+      </div>
+    </div>
+  </ng-container>
+  
+  <ng-container *ngIf="!loading && question">
+    <p class="question">
+      <ng-content select="[question-prefix]"></ng-content>{{ question.text }}
+    </p>
+    <div class="options">
+      <label class="option" *ngFor="let option of question.options" [class.selected]="question.selectedOption === option.id">
+        <input 
+          type="radio" 
+          [id]="option.id" 
+          [name]="question.id" 
+          [value]="option.id"
+          [checked]="question.selectedOption === option.id"
+          (change)="onOptionChange(option.id)">
+        <span class="option-text">{{ option.text }}</span>
+      </label>
+    </div>
+  </ng-container>
+</div> 
