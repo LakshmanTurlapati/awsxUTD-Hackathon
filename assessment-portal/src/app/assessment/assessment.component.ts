@@ -52,9 +52,22 @@ export class AssessmentComponent implements OnInit, OnDestroy {
   formValid = false;
   
   // Popup related
-  showScorePopup = false;
+  private _showScorePopup: boolean = false;
   candidateScores: any = null;
   isScoreLoading = false;
+  
+  get showScorePopup(): boolean {
+    return this._showScorePopup;
+  }
+  
+  set showScorePopup(value: boolean) {
+    this._showScorePopup = value;
+    if (value) {
+      document.body.classList.add('score-popup-active');
+    } else {
+      document.body.classList.remove('score-popup-active');
+    }
+  }
   
   // Transcription data
   currentTranscription = '';
@@ -85,6 +98,12 @@ export class AssessmentComponent implements OnInit, OnDestroy {
   ) {}
   
   ngOnInit() {
+    // Clear transcription text on init to prevent persisting old transcripts
+    this.currentTranscription = '';
+    
+    // Make sure popup is not showing from previous session
+    this.showScorePopup = false;
+    
     // Initialize the experience slider event listener
     const experienceSlider = document.getElementById('experience') as HTMLInputElement;
     const experienceValueElement = document.querySelector('.experience-value') as HTMLElement;
@@ -706,6 +725,9 @@ export class AssessmentComponent implements OnInit, OnDestroy {
             alert('Warning: There was an issue saving your data, but your assessment results are still available. Please contact support.');
           }
         });
+        
+        // Clear the transcription text after submission to prevent persistence
+        this.currentTranscription = '';
       },
       error: (error) => {
         console.error('Error during LLM evaluation:', error);
@@ -723,6 +745,8 @@ export class AssessmentComponent implements OnInit, OnDestroy {
   // Retake the assessment
   retakeAssessment(): void {
     this.showScorePopup = false;
+    // Clear transcription text before retaking the assessment
+    this.currentTranscription = '';
     window.location.reload();
   }
 }

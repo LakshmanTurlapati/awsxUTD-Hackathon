@@ -20,6 +20,11 @@ body.dashboard-active {
   color: #333;
 }
 
+// Add styles for when score popup is active
+body.score-popup-active {
+  overflow: hidden; // Prevent scrolling when popup is active
+}
+
 /* Common styles */
 * {
   box-sizing: border-box;
