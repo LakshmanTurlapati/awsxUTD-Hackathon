@@ -139,7 +139,7 @@
   
   <div class="right-widget">
     <div class="widget visualization-widget">
-      <ng-container *ngIf="selectedCandidate && !showProfileDetails; else noCandidate">
+      <ng-container *ngIf="selectedCandidate; else noCandidate">
         <div class="radar-map-placeholder">
           <canvas id="radarChart"></canvas>
         </div>
@@ -155,36 +155,28 @@
     <!-- Candidate Matches for Referer Requirements -->
     <div class="widget referer-widget">
       <ng-container *ngIf="showCandidateMatches && bestMatch; else noReferer">
-        <div class="best-match-container">
-          <h3>Best Match</h3>
-          
-          <!-- Confetti animation when match is shown -->
-          <div *ngIf="showConfetti" class="confetti-container">
-            <div class="confetti" *ngFor="let i of [1,2,3,4,5,6,7,8,9,10]" 
-                 [ngStyle]="{'--delay': i * 0.1 + 's', '--left': i * 10 + '%'}"></div>
+        <h5 class="match-title">Best Match</h5>
+        
+        <div class="match-content">
+          <div class="match-header">
+            <h4>{{ bestMatch.candidate.name }}</h4>
+            <div class="match-score">{{ bestMatch.matchScore.toFixed(1) }}</div>
           </div>
           
-          <div class="best-match-card">
-            <div class="match-header">
-              <h4>{{ bestMatch.candidate.name }}</h4>
-              <div class="match-score">{{ bestMatch.matchScore.toFixed(1) }}</div>
-            </div>
+          <div class="match-details">
+            <div class="match-education">{{ bestMatch.candidate.education }}</div>
+            <div class="match-experience">{{ bestMatch.candidate.experience }} years experience</div>
             
-            <div class="match-details">
-              <div class="match-education">{{ bestMatch.candidate.education }}</div>
-              <div class="match-experience">{{ bestMatch.candidate.experience }} years experience</div>
-              
-              <div class="match-reasons">
-                <h5>Match Reasons:</h5>
-                <ul>
-                  <li *ngFor="let reason of bestMatch.reasons.slice(0, 3)">{{ reason }}</li>
-                </ul>
-              </div>
+            <div class="match-reasons">
+              <h5>Match Reasons:</h5>
+              <ul>
+                <li *ngFor="let reason of bestMatch.reasons.slice(0, 3)">{{ reason }}</li>
+              </ul>
             </div>
-            
-            <div class="match-actions">
-              <button class="craft-message-btn" (click)="craftMessage()">Craft Message</button>
-            </div>
+          </div>
+          
+          <div class="match-actions">
+            <button class="craft-message-btn" (click)="craftMessage()">Craft Message</button>
           </div>
         </div>
       </ng-container>
@@ -196,7 +188,42 @@
           </div>
         </div>
       </ng-template>
+      
+      <!-- Message popup -->
+      <div *ngIf="showMessagePopup" class="message-popup-overlay">
+        <div class="message-popup">
+          <div class="message-popup-header">
+            <h4>Message Draft</h4>
+            <button class="close-btn" (click)="closeMessagePopup()">×</button>
+          </div>
+          
+          <div class="message-popup-content">
+            <div *ngIf="isLoadingMessage" class="skeleton-loading">
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+            </div>
+            
+            <div *ngIf="!isLoadingMessage && craftedMessage" class="message-content">
+              <p>{{ craftedMessage }}</p>
+              <button class="copy-btn" [class.copied]="isCopied" (click)="copyMessage()">
+                <i class="fa" [ngClass]="isCopied ? 'fa-check' : 'fa-copy'"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="message-popup-footer">
+            <div class="powered-by">
+              <span style="font-weight: bold;">Powered by</span>
+              <img src="assets/gemini.gif" alt="Gemini Animation" class="powered-by-gemini">
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+
+<canvas #confettiCanvas id="confetti-canvas" class="confetti-canvas"></canvas>
 

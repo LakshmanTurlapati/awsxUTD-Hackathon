@@ -47,6 +47,34 @@ export interface CandidateMatch {
   reasons: string[];
 }
 
+export interface LMStudioRequest {
+  messages: {
+    role: string;
+    content: string;
+  }[];
+  model: string;
+  temperature: number;
+}
+
+export interface LMStudioResponse {
+  id: string;
+  object: string;
+  created: number;
+  model: string;
+  choices: {
+    index: number;
+    message: {
+      role: string;
+      content: string;
+    };
+    finish_reason: string;
+  }[];
+}
+
+export interface MessageResponse {
+  message: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
