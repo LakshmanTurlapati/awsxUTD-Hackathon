@@ -17,4 +17,11 @@ urlpatterns = [
     path('candidate/save/', views.save_candidate_view, name='save_candidate'),
     path('candidate/all/', views.get_all_candidates_view, name='get_all_candidates'),
     path('candidate/delete/<str:candidate_id>/', views.delete_candidate_view, name='delete_candidate'),
+    
+    # Referer endpoints
+    path('referer/save/', views.save_referer_view, name='save_referer'),
+    path('referer/all/', views.get_all_referers_view, name='get_all_referers'),
+    path('referer/<str:referer_id>/', views.get_referer_by_id_view, name='get_referer_by_id'),
+    path('referer/delete/<str:referer_id>/', views.delete_referer_view, name='delete_referer'),
+    path('referer/upload-image/<str:referer_id>/', views.upload_profile_image, name='upload_profile_image'),
 ] 

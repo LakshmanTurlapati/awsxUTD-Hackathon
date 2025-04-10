@@ -54,6 +54,7 @@ export class AssessmentComponent implements OnInit, OnDestroy {
   // Popup related
   showScorePopup = false;
   candidateScores: any = null;
+  isScoreLoading = false;
   
   // Transcription data
   currentTranscription = '';
@@ -611,7 +612,6 @@ export class AssessmentComponent implements OnInit, OnDestroy {
     // Validate form
     this.formValid = this.validateForm();
     if (!this.formValid) {
-      // Show validation errors
       console.error('Form validation failed', this.formErrors);
       return;
     }
@@ -634,8 +634,10 @@ export class AssessmentComponent implements OnInit, OnDestroy {
       : of(0);
     
     console.log('Starting LLM evaluation of interpersonal responses...');
-    
-    // Wait for both evaluations to complete
+    this.showScorePopup = true;
+    // Set score loading state before evaluations
+    this.isScoreLoading = true;
+
     forkJoin([interestEvaluation$, careerEvaluation$]).subscribe({
       next: ([interestsScore, careerScore]) => {
         console.log('LLM evaluation complete:', { interestsScore, careerScore });
@@ -665,8 +667,6 @@ export class AssessmentComponent implements OnInit, OnDestroy {
           timestamp: Date.now()
         };
         
-        console.log('Prepared candidate data for save:', candidateData);
-        
         // Store scores for popup
         this.candidateScores = {
           fluency: scores['fluency'],
@@ -687,7 +687,9 @@ export class AssessmentComponent implements OnInit, OnDestroy {
             (scores['cpp'] || 0)
           )
         };
-        
+
+        // Stop score loading state before showing popup
+        this.isScoreLoading = false;
         console.log('Displaying score popup with data:', this.candidateScores);
         
         // Show the score popup
@@ -701,23 +703,12 @@ export class AssessmentComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Error saving candidate data:', error);
-            console.error('Error details:', {
-              status: error.status,
-              statusText: error.statusText,
-              message: error.message,
-              name: error.name,
-              url: error.url,
-              error: error.error
-            });
-            
-            // Show error message to user but don't block the process
             alert('Warning: There was an issue saving your data, but your assessment results are still available. Please contact support.');
           }
         });
       },
       error: (error) => {
         console.error('Error during LLM evaluation:', error);
-        // Proceed with showing results even if LLM evaluation fails
         this.showScorePopup = true;
       }
     });

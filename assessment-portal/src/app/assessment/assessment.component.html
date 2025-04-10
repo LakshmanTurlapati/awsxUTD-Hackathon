@@ -130,49 +130,69 @@
   <!-- Score Popup Modal -->
   <div *ngIf="showScorePopup" class="score-popup-overlay">
     <div class="score-popup">
-      <h2>Assessment Results</h2>
-      <div class="score-summary">
-        <div class="score-item">
-          <span class="score-label">Fluency:</span>
-          <span class="score-value">{{ candidateScores?.fluency || 0 }}/100</span>
+      <ng-container *ngIf="!isScoreLoading; else scoreSkeleton">
+        <h2>Assessment Results</h2>
+        <div class="score-summary">
+          <div class="score-item">
+            <span class="score-label">Fluency:</span>
+            <span class="score-value">{{ candidateScores?.fluency || 0 }}/100</span>
+          </div>
+          <div class="score-item">
+            <span class="score-label">Interpersonal (Average):</span>
+            <span class="score-value">{{ candidateScores?.interpersonal || 0 }}/10</span>
+          </div>
+          <div class="score-item">
+            <span class="score-label">Interests:</span>
+            <span class="score-value">{{ candidateScores?.interests || 0 }}/10</span>
+          </div>
+          <div class="score-item">
+            <span class="score-label">Career Goals:</span>
+            <span class="score-value">{{ candidateScores?.careerGoals || 0 }}/10</span>
+          </div>
+          <div class="score-item">
+            <span class="score-label">Python:</span>
+            <span class="score-value">{{ candidateScores?.python || 0 }}/1</span>
+          </div>
+          <div class="score-item">
+            <span class="score-label">Java:</span>
+            <span class="score-value">{{ candidateScores?.java || 0 }}/1</span>
+          </div>
+          <div class="score-item">
+            <span class="score-label">AWS:</span>
+            <span class="score-value">{{ candidateScores?.aws || 0 }}/1</span>
+          </div>
+          <div class="score-item">
+            <span class="score-label">C++:</span>
+            <span class="score-value">{{ candidateScores?.cpp || 0 }}/1</span>
+          </div>
+          <div class="score-item total-score">
+            <span class="score-label">Total Score:</span>
+            <span class="score-value">{{ candidateScores?.total || 0 }}/34</span>
+          </div>
         </div>
-        <div class="score-item">
-          <span class="score-label">Interpersonal (Average):</span>
-          <span class="score-value">{{ candidateScores?.interpersonal || 0 }}/10</span>
+        <div class="popup-actions">
+          <button (click)="submitScores()" class="btn btn-primary">Submit</button>
+          <button (click)="retakeAssessment()" class="btn btn-secondary">Retake Assessment</button>
         </div>
-        <div class="score-item">
-          <span class="score-label">Interests:</span>
-          <span class="score-value">{{ candidateScores?.interests || 0 }}/10</span>
+      </ng-container>
+      <ng-template #scoreSkeleton>
+        <div class="skeleton-line" style="height: 40px; width: 100%; margin-bottom: 40px;"></div>
+        <div class="score-skeleton">
+          <div class="skeleton-line" style="height: 30px; width: 100%; margin-bottom: 20px;"></div>
+         
+          <div class="skeleton-line" style="height: 30px; width: 80%; margin-bottom: 20px;"></div>
+          <div class="skeleton-line" style="height: 30px; width: 80%; margin-bottom: 20px;"></div>
+          <div class="skeleton-line" style="height: 30px; width: 80%; margin-bottom: 20px;"></div>
+          <div class="skeleton-line" style="height: 30px; width: 80%; margin-bottom: 20px;"></div>
+          <div class="skeleton-line" style="height: 30px; width: 80%; margin-bottom: 20px;"></div>
+          <div class="skeleton-line" style="height: 20px; width: 70%; margin-bottom: 20px;"></div>
+          
         </div>
-        <div class="score-item">
-          <span class="score-label">Career Goals:</span>
-          <span class="score-value">{{ candidateScores?.careerGoals || 0 }}/10</span>
-        </div>
-        <div class="score-item">
-          <span class="score-label">Python:</span>
-          <span class="score-value">{{ candidateScores?.python || 0 }}/1</span>
-        </div>
-        <div class="score-item">
-          <span class="score-label">Java:</span>
-          <span class="score-value">{{ candidateScores?.java || 0 }}/1</span>
-        </div>
-        <div class="score-item">
-          <span class="score-label">AWS:</span>
-          <span class="score-value">{{ candidateScores?.aws || 0 }}/1</span>
-        </div>
-        <div class="score-item">
-          <span class="score-label">C++:</span>
-          <span class="score-value">{{ candidateScores?.cpp || 0 }}/1</span>
-        </div>
-        <div class="score-item total-score">
-          <span class="score-label">Total Score:</span>
-          <span class="score-value">{{ candidateScores?.total || 0 }}/34</span>
-        </div>
-      </div>
-      <div class="popup-actions">
-        <button (click)="submitScores()" class="btn btn-primary">Submit</button>
-        <button (click)="retakeAssessment()" class="btn btn-secondary">Retake Assessment</button>
-      </div>
+      </ng-template>
+      <footer class="app-footer">
+        <span>Powered by</span>
+        <img src="assets/gemini.gif" alt="Gemini Animation" class="powered-by-gemini">
+      </footer>
     </div>
   </div>
 </div>

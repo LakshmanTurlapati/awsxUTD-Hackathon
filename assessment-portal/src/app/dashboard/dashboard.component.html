@@ -2,31 +2,13 @@
   <div class="widget left-widget">
     <h3>Referers</h3>
     <div class="profiles-list">
-      <div class="user-profile" (click)="showUserProfile('prasad')">
+      <div *ngFor="let profile of profilesData | keyvalue" class="user-profile" (click)="showUserProfile(profile.key)">
         <div class="avatar">
-          <img src="../../assets/prasad.jpg" alt="Prasad D">
+          <img [src]="'../../assets/' + profile.value.image" [alt]="profile.value.name">
         </div>
         <div class="user-details">
-          <div class="name">Prasad D.</div>
-          <div class="designation">Devops Engineer</div>
-        </div>
-      </div>
-      <div class="user-profile" (click)="showUserProfile('nijara')">
-        <div class="avatar">
-          <img src="../../assets/nijara.png" alt="Nijara Roy">
-        </div>
-        <div class="user-details">
-          <div class="name">Nijara Roy</div>
-          <div class="designation">Cloud Developer</div>
-        </div>
-      </div>
-      <div class="user-profile" (click)="showUserProfile('akanksha')">
-        <div class="avatar">
-          <img src="../../assets/a.jpeg" alt="Akanksha K">
-        </div>
-        <div class="user-details">
-          <div class="name">Akanksha K.</div>
-          <div class="designation">Java Developer</div>
+          <div class="name">{{ profile.value.name }}</div>
+          <div class="designation">{{ profile.value.role }}</div>
         </div>
       </div>
     </div>
@@ -38,26 +20,62 @@
       <div class="back-button" (click)="hideUserProfile()">
         <i class="fa fa-arrow-left"></i> Back to Candidates
       </div>
-      <div class="profile-card-main">
-        <div class="avatar large">
-          <img [src]="'../../assets/' + currentProfile.image" [alt]="currentProfile.name">
+
+      <div class="top-row">
+        <div class="avatar-container">
+          <div class="avatar large">
+            <!-- Show image preview if available, otherwise show the current profile image -->
+            <img *ngIf="!imagePreview" [src]="'../../assets/' + currentProfile.image" [alt]="currentProfile.name">
+            <img *ngIf="imagePreview" [src]="imagePreview" [alt]="currentProfile.name">
+          </div>
+          <div class="avatar-edit">
+            <label for="profile-image" class="edit-icon">
+              <i class="fa fa-camera"></i>
+            </label>
+            <input 
+              type="file" 
+              id="profile-image" 
+              accept="image/jpeg,image/png,image/gif" 
+              (change)="onImageSelected($event)" 
+              style="display: none;">
+          </div>
+          
+          <!-- Upload progress and button -->
+          <div *ngIf="imageFile && !isUploading" class="upload-action">
+            <button class="upload-button" (click)="uploadImage()">Update Image</button>
+          </div>
+          
+          <div *ngIf="isUploading" class="upload-progress">
+            <div class="progress-bar">
+              <div class="progress-bar-fill" [style.width.%]="uploadProgress"></div>
+            </div>
+            <div class="progress-text">{{ uploadProgress }}%</div>
+          </div>
         </div>
-        <h2>{{ currentProfile.name }}</h2>
-        <p class="designation">{{ currentProfile.role }}</p>
-        <div class="profile-info-main">
-          <div class="info-section">
-            <h3>Skills</h3>
-            <p>{{ currentProfile.skills }}</p>
+        <div class="profile-info">
+          <div class="editable-field">
+            <label>Name</label>
+            <input type="text" [(ngModel)]="currentProfile.name" placeholder="Enter name">
           </div>
-          <div class="info-section">
-            <h3>Experience</h3>
-            <p>{{ currentProfile.experience }}</p>
-          </div>
-          <div class="info-section">
-            <h3>About</h3>
-            <p>{{ currentProfile.about }}</p>
+          <div class="editable-field">
+            <label>Role</label>
+            <input type="text" [(ngModel)]="currentProfile.role" placeholder="Enter role">
           </div>
         </div>
+      </div>
+
+      <div class="about-section">
+        <h3>About</h3>
+        <textarea [(ngModel)]="currentProfile.about" rows="4" placeholder="Enter about information"></textarea>
+      </div>
+
+      <div class="requirement-section">
+        <label>Requirement</label>
+        <textarea [(ngModel)]="currentProfile.requirement" rows="4" placeholder="Enter requirement details"></textarea>
+      </div>
+      
+      <div class="save-button-container">
+        <button class="save-button" (click)="saveProfile()">Save Profile</button>
       </div>
     </div>
 
@@ -120,21 +138,65 @@
   </div>
   
   <div class="right-widget">
-    <div class="widget">
+    <div class="widget visualization-widget">
       <ng-container *ngIf="selectedCandidate && !showProfileDetails; else noCandidate">
         <div class="radar-map-placeholder">
           <canvas id="radarChart"></canvas>
         </div>
       </ng-container>
       <ng-template #noCandidate>
-        <div class="selection-prompt" style="padding-left: 10px; padding-right: 10px;">
+        <div class="selection-prompt">
           <i class="fa fa-info-circle"></i>
           <span>Please select a candidate.</span>
         </div>
       </ng-template>
     </div>
-    <div class="widget">
-      <!-- Unused widget. Will be developed soon -->
+    
+    <!-- Candidate Matches for Referer Requirements -->
+    <div class="widget referer-widget">
+      <ng-container *ngIf="showCandidateMatches && bestMatch; else noReferer">
+        <div class="best-match-container">
+          <h3>Best Match</h3>
+          
+          <!-- Confetti animation when match is shown -->
+          <div *ngIf="showConfetti" class="confetti-container">
+            <div class="confetti" *ngFor="let i of [1,2,3,4,5,6,7,8,9,10]" 
+                 [ngStyle]="{'--delay': i * 0.1 + 's', '--left': i * 10 + '%'}"></div>
+          </div>
+          
+          <div class="best-match-card">
+            <div class="match-header">
+              <h4>{{ bestMatch.candidate.name }}</h4>
+              <div class="match-score">{{ bestMatch.matchScore.toFixed(1) }}</div>
+            </div>
+            
+            <div class="match-details">
+              <div class="match-education">{{ bestMatch.candidate.education }}</div>
+              <div class="match-experience">{{ bestMatch.candidate.experience }} years experience</div>
+              
+              <div class="match-reasons">
+                <h5>Match Reasons:</h5>
+                <ul>
+                  <li *ngFor="let reason of bestMatch.reasons.slice(0, 3)">{{ reason }}</li>
+                </ul>
+              </div>
+            </div>
+            
+            <div class="match-actions">
+              <button class="craft-message-btn" (click)="craftMessage()">Craft Message</button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #noReferer>
+        <div class="referer-content">
+          <div class="selection-prompt">
+            <i class="fa fa-info-circle"></i>
+            <span>Please select a referer.</span>
+          </div>
+        </div>
+      </ng-template>
     </div>
   </div>
 </div>
+

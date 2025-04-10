@@ -6,7 +6,7 @@ import tempfile
 import numpy as np
 import librosa
 from django.conf import settings
-from django.http import StreamingHttpResponse, JsonResponse
+from django.http import StreamingHttpResponse, JsonResponse, HttpResponse
 from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -27,11 +27,12 @@ import logging
 import subprocess
 import whisper
 import random
-from .dynamodb_utils import save_candidate, get_all_candidates, delete_candidate
+from .dynamodb_utils import save_candidate, get_all_candidates, delete_candidate, save_referer, get_all_referers, get_referer_by_id, delete_referer
 from django.views.decorators.csrf import csrf_exempt
+import uuid
 
 # Initialize logger for this module
-logger = logging.getLogger('transcription')
+logger = logging.getLogger(__name__)
 
 class AudioRecordingViewSet(viewsets.ModelViewSet):
     queryset = AudioRecording.objects.all()
@@ -924,3 +925,202 @@ class CompleteAudioUploadView(APIView):
         except Exception as e:
             logger.error(f"Error in complete audio upload: {str(e)}")
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+def save_referer_view(request):
+    """Save referer data to DynamoDB"""
+    if request.method == 'POST':
+        try:
+            # Parse the JSON body
+            data = json.loads(request.body)
+            
+            # Import the save_referer function
+            from .dynamodb_utils import save_referer
+            
+            # Save the referer data
+            referer_id = save_referer(data)
+            
+            return JsonResponse({
+                'success': True,
+                'id': referer_id
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=400)
+    
+    return JsonResponse({
+        'success': False,
+        'error': 'Only POST method is allowed'
+    }, status=405)
+
+def get_all_referers_view(request):
+    """Get all referers from DynamoDB"""
+    if request.method == 'GET':
+        try:
+            # Import the get_all_referers function
+            from .dynamodb_utils import get_all_referers
+            
+            # Get all referers
+            referers = get_all_referers()
+            
+            return JsonResponse(referers, safe=False)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=500)
+    
+    return JsonResponse({
+        'success': False,
+        'error': 'Only GET method is allowed'
+    }, status=405)
+
+def get_referer_by_id_view(request, referer_id):
+    """Get a referer from DynamoDB by ID"""
+    if request.method == 'GET':
+        try:
+            # Import the get_referer_by_id function
+            from .dynamodb_utils import get_referer_by_id
+            
+            # Get the referer by ID
+            referer = get_referer_by_id(referer_id)
+            
+            if referer:
+                return JsonResponse(referer)
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'error': f'Referer with ID {referer_id} not found'
+                }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=500)
+    
+    return JsonResponse({
+        'success': False,
+        'error': 'Only GET method is allowed'
+    }, status=405)
+
+@csrf_exempt
+def delete_referer_view(request, referer_id):
+    """Delete a referer from DynamoDB by ID"""
+    if request.method == 'DELETE':
+        try:
+            # Import the delete_referer function
+            from .dynamodb_utils import delete_referer
+            
+            # Delete the referer
+            success = delete_referer(referer_id)
+            
+            if success:
+                return JsonResponse({
+                    'success': True,
+                    'message': f'Referer with ID {referer_id} deleted successfully'
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'error': f'Failed to delete referer with ID {referer_id}'
+                }, status=500)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=500)
+    
+    return JsonResponse({
+        'success': False,
+        'error': 'Only DELETE method is allowed'
+    }, status=405)
+
+@csrf_exempt
+def upload_profile_image(request, referer_id):
+    """Upload a profile image for a referer"""
+    if request.method == 'POST':
+        try:
+            # Check if there's a file in the request
+            if 'image' in request.FILES:
+                image_file = request.FILES['image']
+                
+                # Generate a unique filename
+                filename = f"{referer_id}_{uuid.uuid4().hex}.{image_file.name.split('.')[-1]}"
+                
+                # Save the file to the media folder
+                file_path = os.path.join('profiles', filename)
+                path = default_storage.save(file_path, ContentFile(image_file.read()))
+                
+                # Get the URL to the saved file
+                image_url = settings.MEDIA_URL + path
+                
+                # Update the referer's image filename
+                from .dynamodb_utils import get_referer_by_id, save_referer
+                
+                referer = get_referer_by_id(referer_id)
+                if referer:
+                    referer['image'] = filename
+                    save_referer(referer)
+                
+                return JsonResponse({
+                    'success': True,
+                    'filename': filename,
+                    'url': image_url
+                })
+            
+            # Check if there's base64 image data in the request body
+            else:
+                data = json.loads(request.body)
+                if 'imageData' in data:
+                    # Parse the base64 data
+                    image_data = data['imageData']
+                    # Remove the data URL prefix if present
+                    if image_data.startswith('data:image'):
+                        image_format, image_data = image_data.split(';base64,')
+                        image_ext = image_format.split('/')[-1]
+                    else:
+                        image_ext = 'png'  # Default extension
+                    
+                    # Generate a unique filename
+                    filename = f"{referer_id}_{uuid.uuid4().hex}.{image_ext}"
+                    
+                    # Decode the base64 image data
+                    image_content = base64.b64decode(image_data)
+                    
+                    # Save the file
+                    file_path = os.path.join('profiles', filename)
+                    path = default_storage.save(file_path, ContentFile(image_content))
+                    
+                    # Get the URL to the saved file
+                    image_url = settings.MEDIA_URL + path
+                    
+                    # Update the referer's image filename
+                    from .dynamodb_utils import get_referer_by_id, save_referer
+                    
+                    referer = get_referer_by_id(referer_id)
+                    if referer:
+                        referer['image'] = filename
+                        save_referer(referer)
+                    
+                    return JsonResponse({
+                        'success': True,
+                        'filename': filename,
+                        'url': image_url
+                    })
+            
+            return JsonResponse({
+                'success': False,
+                'error': 'No image file or data provided'
+            }, status=400)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=500)
+    
+    return JsonResponse({
+        'success': False,
+        'error': 'Only POST method is allowed'
+    }, status=405)

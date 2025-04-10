@@ -463,3 +463,23 @@
     color: #333;
   }
 }
+
+/* Footer styling inside score popup */
+.score-popup .app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.score-popup .app-footer span {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.score-popup .app-footer .powered-by-gemini {
+  width: 65px;
+  height: auto;
+}
