@@ -14,7 +14,7 @@ export class LlmService {
   constructor(private http: HttpClient) { }
 
   generateQuestion(topic: string, yearsExperience: number): Observable<any> {
-    const prompt = `Ask a ${topic} technical question for a candidate with ${yearsExperience} years of work experience. 
+    const prompt = `Ask a ${topic} technical question with a difficulty a candidate with ${yearsExperience} years of work experience could. 
     
 Return your response in the following JSON format:
 {
@@ -38,7 +38,7 @@ Ensure the "answer" field contains only a single letter (A, B, C, or D) correspo
           content: prompt
         }
       ],
-      temperature: 0.9,
+      temperature: 0.1,
       max_tokens: 1000
     };
 

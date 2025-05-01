@@ -667,22 +667,22 @@
   flex: 1;
   
   .editable-field {
-    margin-bottom: 1rem;
+    margin-bottom: 0.15rem;
     
     label {
       display: block;
       font-size: 0.9rem;
       font-weight: 600;
       color: #232F3E;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.15rem;
     }
     
     input {
       width: 100%;
-      padding: 0.8rem;
+      padding: 0.35rem;
       border: 1px solid #ddd;
       border-radius: 6px;
-      font-size: 1rem;
+      font-size: 0.9rem;
       background-color: #f9f9f9;
       transition: all 0.2s ease;
       
@@ -696,11 +696,11 @@
 }
 
 .about-section, .requirement-section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.15rem;
   
   h3 {
-    margin: 0 0 0.7rem;
-    font-size: 1.1rem;
+    margin: 0;
+    font-size: 0.9rem;
     color: #232F3E;
     font-weight: 600;
     padding: 0;
@@ -708,14 +708,14 @@
   
   textarea {
     width: 100%;
-    padding: 0.8rem;
+    padding: 0.25rem;
     border: 1px solid #ddd;
     border-radius: 6px;
     resize: vertical;
-    font-size: 1rem;
+    font-size: 0.9rem;
     background-color: #f9f9f9;
     transition: all 0.2s ease;
-    min-height: 100px;
+    min-height: 40px;
     
     &:focus {
       outline: none;
@@ -728,13 +728,13 @@
 .save-button-container {
   display: flex;
   justify-content: flex-end;
-  margin-top: 1.5rem;
+  margin-top: 0.8rem;
   
   .save-button {
     background-color: #FF9900;
     color: white;
     border: none;
-    padding: 0.8rem 1.6rem;
+    padding: 0.5rem 1rem;
     font-size: 1rem;
     font-weight: 600;
     border-radius: 6px;
